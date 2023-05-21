@@ -6,6 +6,8 @@ import registration from '../views/registration'
 import allUserList from '../components/allUserList'
 import user from '../components/user'
 import contactBook from '../components/contactBook'
+import userContact from '../components/userContact'
+import chatUser from '../components/chatUser'
 
 
 const routes = [
@@ -15,7 +17,9 @@ const routes = [
   { path: '/registration', name: 'registration', component: registration },
   { path: '/allUserList', name: 'allUserList', component: allUserList },
   { path: '/user/:userId', name: 'user', component: user },
-  { path: '/contactBook', name: 'contactBook', component: contactBook }
+  { path: '/contactBook', name: 'contactBook', component: contactBook },
+  { path: '/userContact/:userId', name: 'userContact', component: userContact },
+  { path: '/chatUser/:userId', name: 'chatUser', component: chatUser }
 
 
 ]

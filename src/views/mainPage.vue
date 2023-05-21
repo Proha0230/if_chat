@@ -8,7 +8,6 @@
                 <h1>IF_Chat</h1>
             </div>
             <div class="navbarButtonMain" v-if="!$store.state.settingON && $store.state.userID">
-                <!-- <button class="searchButtonMain"></button> -->
                 <button class="exitButton" @click="goExit"></button>
                 <button class="settingsButtonMain" @click="goSettings"></button>
             </div>
@@ -16,10 +15,10 @@
                 <button class="goBackButton" @click="goBack"></button>
             </div>
         </div>
-    <div v-if="!$store.state.settingON && $store.state.userID">
+    <div v-if="!$store.state.settingON && $store.state.userID && !$store.state.idRecordContactInDB && !$store.state.contactDelete" class="mainNavigation">
             <ul class="buttonMenuMain">
-                <li><router-link :to="{name: 'chatList'}">Чаты</router-link></li>
-                <li><router-link :to="{name: 'contactBook'}">Мои контакты</router-link></li>
+                <li><router-link :to="{name: 'chatList'}">Мои диалоги</router-link></li>
+                <li><router-link :to="{name: 'contactBook'}">Список контактов</router-link></li>
                 <li><router-link :to="{name: 'allUserList'}">Все пользователи</router-link></li>
             </ul>
         </div>
@@ -51,6 +50,7 @@ const goExit = ()=>{
     router.push('/')
 }
 
+
 const goBack = ()=>{
     router.push('/chatList')
     store.state.settingON = false
@@ -62,6 +62,10 @@ const goBack = ()=>{
 </script>
 
 <style>
+
+.mainNavigation{
+    background-color: mediumaquamarine;
+}
 
 .main{
     text-align: center;
@@ -81,6 +85,7 @@ const goBack = ()=>{
 }
 
 .exitButton{
+    cursor: pointer;
     background-image: url(../assets/Exit.png);
     padding: 1.5rem;
     background-size: cover;
@@ -92,16 +97,8 @@ const goBack = ()=>{
     margin-top: 1.5rem;
 }
 
-.searchButtonMain{
-    background-image: url(../assets/search.png);
-    padding: 1.5rem;
-    background-size: cover;
-    background-color: mediumaquamarine;
-    border-radius: 40px;
-    margin-right: 0.5rem;
-}
-
 .settingsButtonMain{
+    cursor: pointer;
     background-image: url(../assets/settings.png);
     padding: 1.5rem;
     background-size: cover;
@@ -113,6 +110,7 @@ const goBack = ()=>{
 }
 
 .goBackButton{
+    cursor: pointer;
     background-image: url(../assets/goBack.png);
     padding: 1.5rem;
     background-size: cover;
@@ -133,12 +131,23 @@ const goBack = ()=>{
 
 .buttonMenuMain{
     display: inline-flex;
-    margin-right: 2rem;
+    margin-left: -2rem;
 }
 
 .buttonMenuMain li{
+    height: 2.5rem;
+    border: solid;
+    padding: 0.3rem;
+    border-radius: 13px;
+    background-color: beige;
+    border-width: 3px;
     margin: 0rem 1rem;
     list-style-type: none;
+}
+
+.buttonMenuMain a{
+    text-decoration: none;
+    color: black;
 }
 
 </style>

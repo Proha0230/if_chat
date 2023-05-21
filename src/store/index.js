@@ -4,6 +4,8 @@ export default createStore({
   state: {
     settingON: false,
     userID: null,
+    idRecordContactInDB: null,
+    contactDelete: null,
     userEmail: '',
     userInfo: '',
     userName:'',

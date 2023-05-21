@@ -2,7 +2,7 @@
 <div >
     <div class="mainSettings" >
         <div class="imgSettings">
-            <img :src="img" alt="Изображения нет"/>
+            <img :src="img ?? 'https://i.ibb.co/dMqXwmP/no-image.jpg' " alt="Изображения нет"/>
             <button class="editImgButtonSettings" @click="ButtonImgEdit = !ButtonImgEdit"></button>
         </div>
 
@@ -16,11 +16,11 @@
                 <p>Ваше имя:</p>
                 <button class="editNameButtonSettings" @click="ButtonNameEdit = !ButtonNameEdit"></button>
             </div>
-            <h3>{{ name === '' ? 'Имя не задано' : name}}</h3>
+            <h3>{{ name ?? 'Имя не задано'}}</h3>
         </div>
 
         <form class="formEditName" v-if="ButtonNameEdit" @submit.prevent="nameEditChange">
-            <input type="text" placeholder="Введите новое имя" v-model="nameEdit">
+            <input type="text" placeholder="Введите новое имя" v-model="nameEdit" maxlength="13">
             <button>Изменить</button>
         </form>
 
@@ -29,7 +29,7 @@
                 <p>Ваш Статус:</p>
                 <button class="editStatusButtonSettings" @click="ButtonStatusEdit = !ButtonStatusEdit"></button>
             </div>
-            <h3>{{ status === '' ? 'Нет статуса' : status }}</h3>
+            <h3>{{ status ?? 'Нет статуса' }}</h3>
         </div>
 
         <form class="formEditStatus" v-if="ButtonStatusEdit" @submit.prevent="statusEditChange">
@@ -42,7 +42,7 @@
                 <p>Информация о вас:</p>
                 <button class="editInfoButtonSettings" @click="ButtonInfoEdit = !ButtonInfoEdit"></button>
             </div>
-            <h3>{{ info === '' ? 'Нет информации о вас' : info }}</h3>
+            <h3>{{ info ?? 'Нет информации'}}</h3>
         </div>
 
         <form class="formEditInfo" v-if="ButtonInfoEdit" @submit.prevent="InfoEditChange">
@@ -81,10 +81,10 @@ export default{
 
         const nameEditChange = async ()=> {
             try{
-            const body = JSON.stringify({name: nameEdit.value})
+            const body = JSON.stringify({name: nameEdit.value ?? 'Имя не задано'})
             await axios.patch(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}.json`, body )
-            name.value = nameEdit.value
-            store.state.userName = nameEdit.value
+            name.value = nameEdit.value ?? 'Имя не задано'
+            store.state.userName = nameEdit.value ?? 'Имя не задано'
             ButtonNameEdit.value = false
             } catch(e){
                 console.log(e)
@@ -93,10 +93,10 @@ export default{
 
         const imgEditChange = async ()=> {
             try{
-                const body = JSON.stringify({img: imgEdit.value})
+                const body = JSON.stringify({img: imgEdit.value ?? 'https://i.ibb.co/dMqXwmP/no-image.jpg'})
                 await axios.patch(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}.json`, body )
-                img.value = imgEdit.value
-                store.state.userImg = imgEdit.value
+                img.value = imgEdit.value ?? 'https://i.ibb.co/dMqXwmP/no-image.jpg'
+                store.state.userImg = imgEdit.value ?? 'https://i.ibb.co/dMqXwmP/no-image.jpg'
                 ButtonImgEdit.value = false
             } catch(e){
                 console.log(e)
@@ -105,10 +105,10 @@ export default{
 
         const statusEditChange = async ()=> {
             try{
-                const body = JSON.stringify({status: statusEdit.value})
+                const body = JSON.stringify({status: statusEdit.value ?? 'Нет статуса'})
                 await axios.patch(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}.json`, body )
-                status.value = statusEdit.value
-                store.state.userStatus = statusEdit.value
+                status.value = statusEdit.value ?? 'Нет статуса'
+                store.state.userStatus = statusEdit.value ?? 'Нет статуса'
                 ButtonStatusEdit.value = false
             } catch(e){
                 console.log(e)
@@ -117,10 +117,10 @@ export default{
 
         const InfoEditChange = async ()=> {
             try{
-                const body = JSON.stringify({info: infoEdit.value})
+                const body = JSON.stringify({info: infoEdit.value ?? 'Нет информации'})
                 await axios.patch(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}.json`, body )
-                info.value = infoEdit.value
-                store.state.userInfo = infoEdit.value
+                info.value = infoEdit.value ?? 'Нет информации'
+                store.state.userInfo = infoEdit.value ?? 'Нет информации'
                 ButtonInfoEdit.value = false
             } catch(e) {
                 console.log(e)
@@ -139,6 +139,7 @@ export default{
 <style>
 
 .editStatusButtonSettings{
+    cursor: pointer;
     background-image: url(../assets/edit.png);
     padding: 1rem;
     background-size: cover;
@@ -151,6 +152,7 @@ export default{
 }
 
 .editNameButtonSettings{
+    cursor: pointer;
     background-image: url(../assets/edit.png);
     padding: 1rem;
     background-size: cover;
@@ -163,6 +165,7 @@ export default{
 }
 
 .editInfoButtonSettings{
+    cursor: pointer;
     background-image: url(../assets/edit.png);
     padding: 1rem;
     background-size: cover;
@@ -176,6 +179,7 @@ export default{
 
 
 .editImgButtonSettings{
+    cursor: pointer;
     background-image: url(../assets/edit.png);
     padding: 1rem;
     background-size: cover;

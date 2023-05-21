@@ -43,16 +43,13 @@ export default{
 <style>
 
 .allUserListInfo{
+    cursor: pointer;
     border: solid;
     border-radius: 49px;
     width: 21rem;
     height: 5rem;
     margin: 1rem 0rem;
     background: mediumaquamarine;
-}
-
-.allUserList :hover{
-    background-color: aqua;
 }
 
 .allUserListInfo h4{
