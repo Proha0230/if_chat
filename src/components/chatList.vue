@@ -4,8 +4,8 @@
     <div v-if="!userAllData">
         <h2>Диалогов пока-что нет</h2>
     </div>
-    <div v-if="userAllData" class="allChatUser">
-        <div v-for="user in userAllData" :key="user" @click="goChatUser(user.userID)">
+    <div v-if="userAllData" >
+        <div v-for="user in userAllData" :key="user" @click="goChatUser(user.userID)" class="allChatUser" >
             <h4>{{ user.name }}</h4>
         </div>
     </div>
@@ -28,19 +28,10 @@ export default{
     const userChatId = ref()
     const userAllData = ref()
 
-    // const getUserChatId = async ()=>{
-    //     const {data} = await axios.get(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/chat.json`)
-        
-    //     userChatId.value = Object.keys(data)
-    //     console.log(userChatId.value)
-    //     getUserChatData()
-    // }
-
     const getIdChatUser = async ()=>{
     try{
         const {data} = await axios.get(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/chat.json`)
         userChatId.value = Object.keys(data)
-        console.log(userChatId.value)
         await getAllUser()
     } catch (e){
         console.log(e)
@@ -52,7 +43,6 @@ export default{
         const {data} = await axios.get(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/.json`)
         userAllData.value =  Object.values(data)
         userAllData.value = userAllData.value.filter(userInAllData => userChatId.value.includes(userInAllData.userID))
-        console.log(userAllData.value)
     } catch(e){
         console.log(e)
     }

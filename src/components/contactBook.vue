@@ -66,10 +66,16 @@
                 const bodyUserSends = JSON.stringify({
                     message: writeTextMessage.value,
                     userName: store.state.userName,
-                    userID: store.state.userID
+                    userID: store.state.userID,
+                    newMessage: true
                 })
-                await axios.post(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${id}/chat/${store.state.userID}.json`, bodyUserSends )
+                const {data} = await axios.post(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${id}/chat/${store.state.userID}.json`, bodyUserSends )
                 
+                const bodyUserPatchId = JSON.stringify({ idMessage: data.name })
+                await axios.patch(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${id}/chat/${store.state.userID}/${data.name}.json`, bodyUserPatchId )
+
+
+
                 const myBody = JSON.stringify({
                     message: writeTextMessage.value,
                     userName: store.state.userName, 

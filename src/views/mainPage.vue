@@ -16,11 +16,11 @@
             </div>
         </div>
     <div v-if="!$store.state.settingON && $store.state.userID && !$store.state.idRecordContactInDB && !$store.state.contactDelete" class="mainNavigation">
-            <ul class="buttonMenuMain">
-                <li><router-link :to="{name: 'chatList'}">Мои диалоги</router-link></li>
-                <li><router-link :to="{name: 'contactBook'}">Список контактов</router-link></li>
-                <li><router-link :to="{name: 'allUserList'}">Все пользователи</router-link></li>
-            </ul>
+            <div class="buttonMenuMain">
+                <button><router-link :to="{name: 'chatList'}">Мои диалоги</router-link></button>
+                <button><router-link :to="{name: 'contactBook'}">Список контактов</router-link></button>
+                <button><router-link :to="{name: 'allUserList'}">Все пользователи</router-link></button>
+            </div>
         </div>
         </div>
     </div>
@@ -129,9 +129,16 @@ const goBack = ()=>{
     margin-top: 1.5rem;
 }
 
+.buttonMenuMain button{
+    cursor: pointer;
+    margin: 0rem 0.2rem;
+    padding: 0.2rem;
+    background-color: beige;
+    border-radius: 1rem;
+}
+
 .buttonMenuMain{
-    display: inline-flex;
-    margin-left: -2rem;
+    padding: 1rem 0rem;
 }
 
 .buttonMenuMain li{
@@ -141,7 +148,7 @@ const goBack = ()=>{
     border-radius: 13px;
     background-color: beige;
     border-width: 3px;
-    margin: 0rem 1rem;
+    margin: 0rem 0.5rem;;
     list-style-type: none;
 }
 
