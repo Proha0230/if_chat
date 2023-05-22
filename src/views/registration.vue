@@ -1,6 +1,9 @@
 <template>
 
     <div class="main">
+        <div class="regSuccess" v-if="emailUserDer">
+            <h3>Вы успешно зарегистрировали аккаунт {{ emailUserDer }}</h3>
+        </div>
         <div class="formRegMain">
             <h1>Регистрация</h1>
             <form class="formReg" @submit.prevent="bodySubmit"> 
@@ -27,6 +30,7 @@ export default{
         const router = useRouter()
         const login = ref()
         const password = ref()
+        const emailUserDer = ref('')
         
         const goAuth = ()=>{
             router.push('/')
@@ -36,7 +40,11 @@ export default{
         try{
         const url = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${process.env.VUE_APP_FB_KEY}`
         const {data} = await axios.post(url, {email: login.value, password: password.value, returnSecureToken: true})
-        router.push('/')
+        emailUserDer.value = data.email
+        setTimeout(()=>{
+            emailUserDer.value = ''
+            router.push('/')
+        }, 2000)
         } catch(e){
             console.log(e)
         }
@@ -44,17 +52,31 @@ export default{
     }
 
 
-        return{goAuth, bodySubmit, login, password}
+        return{goAuth, bodySubmit, login, password, emailUserDer}
     }
 }
 
 </script>
 
 <style>
+
+.regSuccess{
+    border: solid;
+    padding: 1rem;
+    width: -webkit-fill-available;
+    max-width: 26rem;
+    border-radius: 1rem;
+    margin-top: 0.5rem;
+    margin-bottom: -8rem;
+    background-color: mediumaquamarine;
+    font-size: 1.2rem;
+}
+
 .formReg button{
     border-radius: 20px;
     padding: 0.5rem;
     background-color: mediumaquamarine;
+    margin: 0.5rem 0rem;
 }
 
 .formReg{

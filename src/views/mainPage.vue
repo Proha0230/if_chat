@@ -43,10 +43,15 @@ const goSettings = ()=>{
     store.state.settingON = true
 }
 const goExit = ()=>{
+    store.state.settingON = false
     store.state.userID = null
+    store.state.idRecordContactInDB = null
+    store.state.contactDelete = null
     store.state.userEmail = ''
     store.state.userInfo = ''
     store.state.userName = ''
+    store.state.userStatus = ''
+    store.state.userImg = ''
     router.push('/')
 }
 
@@ -69,7 +74,8 @@ const goBack = ()=>{
 
 .main{
     text-align: center;
-    max-width: 25rem;
+    width: -webkit-fill-available;
+    max-width: 26rem;
 }
 
 .navbarMain{

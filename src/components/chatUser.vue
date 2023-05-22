@@ -5,7 +5,12 @@
         <div v-if="newMessageTrue" class="newMessage">
             <h3>У вас новое сообщение</h3>
         </div>
-        <div v-for="user in userChatData" :key="user" class="chatUserMessageList" :style="{marginLeft: user.userName === $store.state.userName ? '4rem' : '-4rem'}">
+        <div v-for="user in userChatData" :key="user" class="chatUserMessageList"
+        :style="{
+            marginLeft: user.userName === $store.state.userName ? '4rem' : '-4rem',
+            background: user.userName === $store.state.userName ? 'mediumaquamarine' : 'beige'
+
+            }">
         <h4 class="h4userName" :style="{marginLeft: user.userName === $store.state.userName ? '10rem' : '1.2rem'}" >{{ user.userName }}</h4>
         <h4 class="h4userMessage" :style="{marginLeft: user.userName === $store.state.userName ? '-15.8rem' : '-7rem'}">{{ user.message }}</h4>
         </div>
@@ -109,21 +114,21 @@ export default{
 
 
 
-        const updateChatData =
-            setInterval(()=>{
-                getUserChatData()
-            }, 5000)
+        // const updateChatData =
+        //     setInterval(()=>{
+        //         getUserChatData()
+        //     }, 5000)
         
-        updateChatData
+        // updateChatData
 
-        setTimeout(()=>{
-        const elem = document.querySelector('.chatUserMain')
-        elem.scrollTo(0, 100000000)
-        }, 300)
+        // setTimeout(()=>{
+        // const elem = document.querySelector('.chatUserMain')
+        // elem.scrollTo(0, 100000000)
+        // }, 300)
 
-        onBeforeUnmount(()=>{
-            clearInterval(updateChatData)
-        })
+        // onBeforeUnmount(()=>{
+        //     clearInterval(updateChatData)
+        // })
 
         getUserChatData()
 
@@ -160,6 +165,7 @@ export default{
     height: -webkit-fill-available;
     overflow-x: hidden;
     overflow-y: scroll;
+    background-image: url('../assets/backgroundChat.jpg');
     }
 
     .chatUserMain::-webkit-scrollbar{
@@ -177,7 +183,7 @@ export default{
     max-width: 26rem;
     height: 5rem;
     background-color: mediumaquamarine;
-    margin-top: 0.5rem;
+    padding-top: 0.5rem;
     }
 
     .formSendMessage input{
@@ -203,7 +209,7 @@ export default{
     height: 5.5rem;
     margin: 1rem 0rem;
     margin-left: -4rem;
-    background: beige;
+    background: mediumaquamarine;
     display: flex;
     }
 

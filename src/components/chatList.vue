@@ -1,6 +1,6 @@
 <template>
     
-<div>
+<div class="chatListMain">
     <div v-if="!userAllData">
         <h2>Диалогов пока-что нет</h2>
     </div>
@@ -17,6 +17,7 @@
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import { ref } from 'vue';
+import { onBeforeUnmount } from 'vue';
 import axios from 'axios';
 
 export default{
@@ -28,27 +29,34 @@ export default{
     const userChatId = ref()
     const userAllData = ref()
 
-    const getIdChatUser = async ()=>{
+    const getChatUserList = async ()=>{
     try{
         const {data} = await axios.get(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/chat.json`)
         userChatId.value = Object.keys(data)
-        await getAllUser()
-    } catch (e){
-        console.log(e)
-    }
+        await getUserChat()
+    } catch (e){}
     }
 
-    const getAllUser = async ()=>{
+    const getUserChat = async ()=>{
     try{
         const {data} = await axios.get(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/.json`)
         userAllData.value =  Object.values(data)
         userAllData.value = userAllData.value.filter(userInAllData => userChatId.value.includes(userInAllData.userID))
-    } catch(e){
-        console.log(e)
-    }
+    } catch(e){}
     }
 
-    getIdChatUser()
+    getChatUserList()
+
+    const updateChatData =
+        setInterval(()=>{
+            getChatUserList()
+        }, 5000)
+        
+    updateChatData
+
+    onBeforeUnmount(()=>{
+        clearInterval(updateChatData)
+    })
 
     const goChatUser = (id)=> {
         router.push('/chatUser/' + id)
@@ -75,5 +83,14 @@ export default{
         width: 13rem;
         height: 0rem;
         margin-top: 2rem;
+    }
+
+    .chatListMain{
+    width: -webkit-fill-available;
+    max-width: 26rem;
+    height: 43rem;
+    background-image: url(../assets/backgroundAllUser.jpg);
+    padding-top: 0.5rem;
+    background-repeat: round;
     }
 </style>

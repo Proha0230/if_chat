@@ -53,9 +53,19 @@ export default{
 }
 
 .allUserListInfo h4{
-    width: 13rem;
+    width: 20rem;
     height: 0rem;
+    margin-top: 1rem;
     margin-bottom: 1.5rem;
+}
+
+.allUserListMain{
+    width: -webkit-fill-available;
+    max-width: 26rem;
+    height: 43rem;
+    background-image: url(../assets/backgroundAllUser.jpg);
+    padding-top: 0.5rem;
+    background-repeat: round;
 }
 
 </style>

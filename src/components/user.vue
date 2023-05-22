@@ -132,7 +132,7 @@ export default{
     width: 10rem;
     height: 13rem;
     margin-top: 1rem;
-    margin-left: 0rem;
+    margin-left: 0.5rem;
     border-radius: 20px;
     border: solid;
     border-width: 0.3rem;
@@ -145,7 +145,12 @@ export default{
 }
 
 .userMain{
-    max-width: 25rem;
+    width: -webkit-fill-available;
+    max-width: 26rem;
+    height: 43rem;
+    background-image: url(../assets/backgroundAllUser.jpg);
+    padding-top: 0.5rem;
+    background-repeat: round;
 }
 
 .userNameMain{

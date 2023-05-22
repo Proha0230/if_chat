@@ -1,12 +1,13 @@
 <template>
 
-    <h1 v-if="!contactUserData">Контактов пока нет</h1>
-    <div class="contactDelete" v-if="$store.state.contactDelete">
+
+    <div class="allUserListMain">
+        <div class="contactDelete" v-if="$store.state.contactDelete">
             <h2>Вы удалили контакт</h2>
         </div>
-    <div class="allUserListMain" v-if="contactUserData">
-        <div class="allUserList">
-            <div class="allUserListInfo" :style="{height: user.writeMessage ? '9rem' : '5rem'}"  v-for="user in contactUserData" :key="user">
+        <h2 v-if="!contactUserData">Контактов пока нет</h2>
+        <div class="allUserList" v-if="contactUserData">
+            <div class="contactBookList" :style="{height: user.writeMessage ? '9rem' : '5rem'}"  v-for="user in contactUserData" :key="user">
                 <form class="sendMessage" v-if="user.writeMessage" @submit.prevent="writeMessage(user.userID), user.writeMessage = false">
                     <input type="text" v-model="writeTextMessage" maxlength="84" spellcheck="true"/>
                     <button>Отправить</button>
@@ -42,9 +43,7 @@
             try{
                 const {data} = await axios.get(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/contactList.json`)           
                 contactUserData.value = Object.values(data)
-            } catch(e){
-                console.log(e)
-            }
+            } catch(e){}
             }
 
             const deleteContact = async (id, idInDB)=>{
@@ -54,6 +53,9 @@
                 store.state.contactDelete = true
 
                 setTimeout(()=>{
+                if(!contactUserData.value.length){
+                    contactUserData.value = ''
+                }
                 store.state.contactDelete = null
                 }, 2000)
             }catch(e){
@@ -157,11 +159,10 @@
 
     .contactDelete{
     width: -webkit-fill-available;
-    max-width: 24rem;
+    max-width: 25.5rem;
     border: solid;
     border-radius: 30px;
     margin-top: 0.25rem;
-    margin-bottom: -0.7rem;
     background-color: red;
     }  
 
@@ -196,7 +197,8 @@
     }
 
     
-    .allUserListInfo{
+    .contactBookList{
+        cursor: pointer;
         border: solid;
         border-radius: 49px;
         width: 21rem;
@@ -206,7 +208,7 @@
     }
     
     
-    .allUserListInfo h4{
+    .contactUserInfo h4{
         width: 13rem;
         height: 0rem;
         margin-bottom: 1.5rem;
