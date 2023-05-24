@@ -2,9 +2,7 @@
 
 <div class="mainChatUser">
     <div class="chatUserMain">
-        <div v-if="newMessageTrue" class="newMessage">
-            <h3>У вас новое сообщение</h3>
-        </div>
+
         <div v-for="user in userChatData" :key="user" class="chatUserMessageList"
         :style="{
             marginLeft: user.userName === $store.state.userName ? '4rem' : '-4rem',
@@ -39,7 +37,6 @@ export default{
         const userChatData = ref()
         const writeTextMessage = ref()
         const readMessageTrue = ref()
-        const newMessageTrue = ref(false)
 
         const getUserChatData = async ()=>{
         try{
@@ -50,25 +47,30 @@ export default{
             readMessageTrue.value = readMessageTrue.value.map( user => user.idMessage)
   
             if(readMessageTrue.value.length){
-            newMessageTrue.value = true
             setTimeout(()=>{
             const elem = document.querySelector('.chatUserMain')
             elem.scrollTo(0, 100000000)
             }, 3000)
             }
             
-            const bodyWriteMessage = JSON.stringify({
-                newMessage: false
-            })
 
             setTimeout( async ()=>{
             for(let i = 0; i < readMessageTrue.value.length; i++){
+            const bodyWriteMessage = JSON.stringify({
+                newMessage: false
+            })
             if(readMessageTrue.value.length){
             await axios.patch(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/chat/${route.params.userId}/${readMessageTrue.value[i]}.json`, bodyWriteMessage )
-            newMessageTrue.value = false
+            store.state.newMessageTrue = false
+
             }
             }
-            }, 3000)
+            }, 500)
+
+            setTimeout(()=>{
+                store.state.newMessageUser = {}
+            }, 1500)
+
             
         }catch(e){
             console.log(e)
@@ -114,25 +116,25 @@ export default{
 
 
 
-        // const updateChatData =
-        //     setInterval(()=>{
-        //         getUserChatData()
-        //     }, 5000)
+        const updateChatData =
+            setInterval(()=>{
+                getUserChatData()
+            }, 5000)
         
-        // updateChatData
+        updateChatData
 
-        // setTimeout(()=>{
-        // const elem = document.querySelector('.chatUserMain')
-        // elem.scrollTo(0, 100000000)
-        // }, 300)
+        setTimeout(()=>{
+        const elem = document.querySelector('.chatUserMain')
+        elem.scrollTo(0, 100000000)
+        }, 300)
 
-        // onBeforeUnmount(()=>{
-        //     clearInterval(updateChatData)
-        // })
+        onBeforeUnmount(()=>{
+            clearInterval(updateChatData)
+        })
 
         getUserChatData()
 
-        return{userChatData, writeTextMessage, writeMessage, newMessageTrue}
+        return{userChatData, writeTextMessage, writeMessage}
     }
 }
 
@@ -142,7 +144,7 @@ export default{
 
 <style>
 
-    .newMessage h3{
+    .newMessageInChatUser h3{
     width: -webkit-fill-available;
     max-width: 26rem;
     position: absolute;

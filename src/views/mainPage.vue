@@ -3,25 +3,33 @@
 <div>
     <div class="main">
         <div>
-        <div class="navbarMain">
-            <div class="navbarLogoMain">
-                <h1>IF_Chat</h1>
+            <div class="navbarMain">
+                <div class="navbarLogoMain">
+                    <h1>IF_Chat</h1>
+                </div>
+                <div class="navbarButtonMain" v-if="!$store.state.settingON && $store.state.userID">
+                    <button class="exitButton" @click="goExit"></button>
+                    <button class="settingsButtonMain" @click="goSettings"></button>
+                </div>
+                <div class="navbarButtonMain" v-if="$store.state.settingON">
+                    <button class="goBackButton" @click="goBack"></button>
+                </div>
             </div>
-            <div class="navbarButtonMain" v-if="!$store.state.settingON && $store.state.userID">
-                <button class="exitButton" @click="goExit"></button>
-                <button class="settingsButtonMain" @click="goSettings"></button>
-            </div>
-            <div class="navbarButtonMain" v-if="$store.state.settingON">
-                <button class="goBackButton" @click="goBack"></button>
-            </div>
+        <div v-if="!$store.state.settingON && $store.state.userID && !$store.state.idRecordContactInDB && !$store.state.contactDelete" class="mainNavigation">
+                <div class="buttonMenuMain">
+                    <button><router-link :to="{name: 'chatList'}">Мои диалоги</router-link></button>
+                    <button><router-link :to="{name: 'contactBook'}">Список контактов</router-link></button>
+                    <button><router-link :to="{name: 'allUserList'}">Все пользователи</router-link></button>
+                </div>
         </div>
-    <div v-if="!$store.state.settingON && $store.state.userID && !$store.state.idRecordContactInDB && !$store.state.contactDelete" class="mainNavigation">
-            <div class="buttonMenuMain">
-                <button><router-link :to="{name: 'chatList'}">Мои диалоги</router-link></button>
-                <button><router-link :to="{name: 'contactBook'}">Список контактов</router-link></button>
-                <button><router-link :to="{name: 'allUserList'}">Все пользователи</router-link></button>
-            </div>
-        </div>
+                <div v-if="$store.state.newMessageTrue" class="newMessageInMainPage">
+                    <h3>У вас новое сообщение</h3>
+
+                    <audio controls autoplay style="display: none;">
+                        <source src="../assets/soundMessage.mp3" type="audio/mp3">
+                    </audio>
+
+                </div>
         </div>
     </div>
 </div>
@@ -37,6 +45,8 @@ export default{
     setup(){
         const router = useRouter()
         const store = useStore()
+
+
 
 const goSettings = ()=>{
     router.push('/settings')
@@ -68,6 +78,23 @@ const goBack = ()=>{
 
 <style>
 
+.newMessageInMainPage{
+    width: -webkit-fill-available;
+    max-width: 26rem;
+    background-color: mediumaquamarine;
+}
+
+.newMessageInMainPage h3{
+    border: solid;
+    margin-left: 0rem;
+    margin-top: 0rem;
+    padding: 1rem 0rem;
+    border-radius: 1rem;
+    background-color: skyblue;
+    font-family: monospace;
+    margin-bottom: 0rem;
+    }
+
 .mainNavigation{
     background-color: mediumaquamarine;
 }
@@ -81,7 +108,7 @@ const goBack = ()=>{
 .navbarMain{
     display: flex;
     background-color: mediumaquamarine;
-    padding-bottom: 2rem;
+    padding-bottom: 1rem;
 }
 
 .navbarButtonMain{

@@ -1,12 +1,13 @@
 <template>
     
 <div class="chatListMain">
-    <div v-if="!userAllData">
+    <div v-if="!usersChatList">
         <h2>Диалогов пока-что нет</h2>
     </div>
-    <div v-if="userAllData" >
-        <div v-for="user in userAllData" :key="user" @click="goChatUser(user.userID)" class="allChatUser" >
+    <div v-if="usersChatList" >
+        <div v-for="user in usersChatList" :key="user"  class="allChatUser" @click="goChatUser(user.userID)">
             <h4>{{ user.name }}</h4>
+            <button v-if="func(user.userID)" class="newMessageButton"></button>
         </div>
     </div>
 </div>
@@ -16,9 +17,7 @@
 <script>
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
-import { ref } from 'vue';
-import { onBeforeUnmount } from 'vue';
-import axios from 'axios';
+import { ref, watch} from 'vue';
 
 export default{
 
@@ -26,49 +25,59 @@ export default{
 
     const store = useStore()
     const router = useRouter()
-    const userChatId = ref()
-    const userAllData = ref()
+    const usersChatList = ref(store.state.usersChatList)
+    const userMessageNew = ref()
 
-    const getChatUserList = async ()=>{
-    try{
-        const {data} = await axios.get(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/chat.json`)
-        userChatId.value = Object.keys(data)
-        await getUserChat()
-    } catch (e){}
+    userMessageNew.value = Object.values(store.state.newMessageUser)
+
+    const func = (idUser) => {
+        try{
+            if(userMessageNew.value.find(i => i == idUser)){
+               return true
+            }
+        }catch(e){
+            console.log(e)
+        }
     }
 
-    const getUserChat = async ()=>{
-    try{
-        const {data} = await axios.get(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/.json`)
-        userAllData.value =  Object.values(data)
-        userAllData.value = userAllData.value.filter(userInAllData => userChatId.value.includes(userInAllData.userID))
-    } catch(e){}
-    }
 
-    getChatUserList()
-
-    const updateChatData =
-        setInterval(()=>{
-            getChatUserList()
-        }, 5000)
-        
-    updateChatData
-
-    onBeforeUnmount(()=>{
-        clearInterval(updateChatData)
+    watch(() => 
+    store.state.usersChatList,
+    async () => {
+    await router.push('/contactBook')
+    await router.push('/chatList')
     })
+
+
 
     const goChatUser = (id)=> {
         router.push('/chatUser/' + id)
     }
 
-        return{userAllData, goChatUser}
+        return{usersChatList, goChatUser, func}
     }
 }
 
 </script>
 
 <style>
+
+
+        
+    .newMessageButton{
+        cursor: pointer;
+        background-image: url('../assets/new-message.png');
+        padding: 1.5rem;
+        background-size: contain;
+        max-height: 1rem;
+        max-width: 1rem;
+        margin-top: -2.5rem;
+        margin-left: 14rem;
+        display: flex;
+        background-color: beige;
+    }
+
+
     .allChatUser{
         cursor: pointer;
         border: solid;
