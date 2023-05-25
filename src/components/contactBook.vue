@@ -9,7 +9,7 @@
         <div class="allUserList" v-if="contactUserData">
             <div class="contactBookList" :style="{height: user.writeMessage ? '9rem' : '5rem'}"  v-for="user in contactUserData" :key="user">
                 <form class="sendMessage" v-if="user.writeMessage" @submit.prevent="writeMessage(user.userID), user.writeMessage = false">
-                    <input type="text" v-model="writeTextMessage" maxlength="84" spellcheck="true"/>
+                    <textarea type="text" v-model="writeTextMessage" maxlength="81" spellcheck="true"></textarea>
                     <button>Отправить</button>
                 </form>
                 <div class="contactUserInfo" @click="goToUser(user.userID)">
@@ -31,114 +31,97 @@
     import { useStore } from 'vuex'
     
     
-    export default{
-        setup(){
-    
-            const router = useRouter()
-            const store = useStore()
-            const contactUserData = ref()
-            const writeTextMessage = ref('')
+export default{
+    setup(){
 
-            const getContactsData = async ()=>{
-            try{
-                const {data} = await axios.get(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/contactList.json`)           
-                contactUserData.value = Object.values(data)
-            } catch(e){}
-            }
+        const router = useRouter()
+        const store = useStore()
+        const contactUserData = ref()
+        const writeTextMessage = ref('')
 
-            const deleteContact = async (id, idInDB)=>{
-            try{
-                await axios.delete(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/contactList/${idInDB}.json`)
-                contactUserData.value = contactUserData.value.filter(contact => contact.userID !== id)
-                store.state.contactDelete = true
-
-                setTimeout(()=>{
-                if(!contactUserData.value.length){
-                    contactUserData.value = ''
-                }
-                store.state.contactDelete = null
-                }, 2000)
-            }catch(e){
-                console.log(e)
-            }
-            }
-
-            const writeMessage = async (id)=> {
-            try{
-                const bodyUserSends = JSON.stringify({
-                    message: writeTextMessage.value,
-                    userName: store.state.userName,
-                    userID: store.state.userID,
-                    newMessage: true
-                })
-                const {data} = await axios.post(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${id}/chat/${store.state.userID}.json`, bodyUserSends )
-                
-                const bodyUserPatchId = JSON.stringify({ idMessage: data.name })
-                await axios.patch(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${id}/chat/${store.state.userID}/${data.name}.json`, bodyUserPatchId )
-
-
-
-                const myBody = JSON.stringify({
-                    message: writeTextMessage.value,
-                    userName: store.state.userName, 
-                    userID: id
-                })
-                await axios.post(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/chat/${id}.json`, myBody )
-
-                writeTextMessage.value = ''
-            } catch(e){
-                console.log(e)
-            }
-            }
-
-
-            getContactsData()
-
-            // const getContactsID = async ()=>{
-            //     try{
-            //     const {data} = await axios.get(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/contactList.json`)
-            //     contactUsersID = Object.values(data).map(item => {
-            //         return item.userID
-            //     })
-            //     await getAllUser()
-            //     } catch(e){
-            //         console.log(e)
-            //     }
-            // }
-            // это если передаем только один параметр от всех параметров пользователя - id
-
-            // const getAllUser= async ()=>{
-            //     try{
-            //     const {data} = await axios.get(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/.json`)
-            //     AllUserList = Object.values(data)
-                
-            //     contactData.value = AllUserList.filter(userInAllList => contactUsersID.includes(userInAllList.userID))
-
-                // таким образом через метод .includes() мы проверяем содержит ли наш массив с id пользователей что мы добавили в контакты - 
-                // такие же id проходясь по каждому обьекту в общем массиве пользователей и в тех обьектах в общем массиве пользователей 
-                // где совпадают эти id (из массива пользователей что мы добавили в контакты) - метод filter() выдаст true и они будут отфильтрованы 
-
-            //     } catch(e){
-            //         console.log(e)
-            //     }
-            // }
-
-
-            const goToUser= (id) =>{
-                router.push('/userContact/' + id)
-            }
-    
-            return{goToUser,contactUserData, deleteContact, writeTextMessage, writeMessage}
+        const getContactsData = async ()=>{
+        try{
+            const {data} = await axios.get(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/contactList.json`)           
+            contactUserData.value = Object.values(data)
+        } catch(e){}
         }
+
+        const deleteContact = async (id, idInDB)=>{
+        try{
+            await axios.delete(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/contactList/${idInDB}.json`)
+            contactUserData.value = contactUserData.value.filter(contact => contact.userID !== id)
+            store.state.contactDelete = true
+
+            setTimeout(()=>{
+            if(!contactUserData.value.length){
+                contactUserData.value = ''
+            }
+            store.state.contactDelete = null
+            }, 2000)
+        }catch(e){
+            console.log(e)
+        }
+        }
+
+        const writeMessage = async (id)=> {
+        try{
+            const bodyUserSends = JSON.stringify({
+                message: writeTextMessage.value,
+                userName: store.state.userName,
+                userID: store.state.userID,
+                newMessage: true
+            })
+            const {data} = await axios.post(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${id}/chat/${store.state.userID}.json`, bodyUserSends )
+            
+            const bodyUserPatchId = JSON.stringify({ idMessage: data.name })
+            await axios.patch(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${id}/chat/${store.state.userID}/${data.name}.json`, bodyUserPatchId )
+
+
+            await copyInMyBodySendMessage(id)
+            writeTextMessage.value = ''
+            goChatUser(id)
+        } catch(e){
+            console.log(e)
+        }
+        }
+
+        const copyInMyBodySendMessage = async (id)=>{
+        const myBody = JSON.stringify({
+            message: writeTextMessage.value,
+            userName: store.state.userName, 
+            userID: id
+        })
+        const {data} = await axios.post(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/chat/${id}.json`, myBody )
+
+        const myBodyPatchIdWriteMessage = JSON.stringify({ idMessage: data.name })
+        await axios.patch(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/chat/${id}/${data.name}.json`, myBodyPatchIdWriteMessage )
+        }
+
+        const goChatUser = (id)=> {
+        router.push('/chatUser/' + id)
+        }
+
+
+        getContactsData()
+
+
+        const goToUser= (id) =>{
+            router.push('/userContact/' + id)
+        }
+
+        return{goToUser,contactUserData, deleteContact, writeTextMessage, writeMessage}
     }
+}
     
     
     </script>
     
     <style>
 
-    .sendMessage input{
-    width: 13rem;
+    .sendMessage textarea{
+    height: 3rem;
+    width: 14rem;
+    resize: none;
     border-radius: 1rem;
     background-color: beige;
     }

@@ -6,15 +6,24 @@
         <div v-for="user in userChatData" :key="user" class="chatUserMessageList"
         :style="{
             marginLeft: user.userName === $store.state.userName ? '4rem' : '-4rem',
-            background: user.userName === $store.state.userName ? 'mediumaquamarine' : 'beige'
-
+            background: user.userName === $store.state.userName ? 'mediumaquamarine' : 'beige',
+            marginBottom: messageIdClick === user.idMessage && editFormOpen ? '7.6rem' : '0rem'
             }">
+        
         <h4 class="h4userName" :style="{marginLeft: user.userName === $store.state.userName ? '10rem' : '1.2rem'}" >{{ user.userName }}</h4>
         <h4 class="h4userMessage" :style="{marginLeft: user.userName === $store.state.userName ? '-15.8rem' : '-7rem'}">{{ user.message }}</h4>
+        <button v-if="user.userName === $store.state.userName" @click="deleteMessage(user.idMessage, user.message)" class="deleteMessege"></button>
+        <button v-if="user.userName === $store.state.userName" @click="func" class="editMessege"></button>
+        <div class="divEditFormMessage" v-if="editFormOpen && messageIdClick === user.idMessage">
+            <form @submit.prevent="editMessage(user.idMessage, user.message)">
+                <textarea type="text"  maxlength="81" spellcheck="true" v-model="editFormMessageData"></textarea>
+                <button>Изменить сообщение</button>
+            </form>
+        </div>
         </div>
     </div>
     <form class="formSendMessage" @submit.prevent="writeMessage">
-        <input type="text" maxlength="84" spellcheck="true" v-model="writeTextMessage"/>
+        <textarea type="text" maxlength="81" spellcheck="true" v-model="writeTextMessage"></textarea>
         <button>Отправить</button>
     </form>
 </div>
@@ -37,6 +46,19 @@ export default{
         const userChatData = ref()
         const writeTextMessage = ref()
         const readMessageTrue = ref()
+        const MyIdMessageInUserData = ref()
+        const editFormOpen = ref(false)
+        const editFormMessageData = ref()
+        const messageIdClick = ref()
+
+        const func = (event) => {
+        try{
+            messageIdClick.value = event.target.parentNode.__vnode.key.idMessage
+            editFormOpen.value = !editFormOpen.value
+        }catch(e){
+            console.log(e)
+        }
+    }
 
         const getUserChatData = async ()=>{
         try{
@@ -50,7 +72,7 @@ export default{
             setTimeout(()=>{
             const elem = document.querySelector('.chatUserMain')
             elem.scrollTo(0, 100000000)
-            }, 3000)
+            }, 500)
             }
             
 
@@ -67,10 +89,7 @@ export default{
             }
             }, 500)
 
-            setTimeout(()=>{
-                store.state.newMessageUser = {}
-            }, 1500)
-
+            store.state.newMessageUser = {}
             
         }catch(e){
             console.log(e)
@@ -91,19 +110,9 @@ export default{
             const bodyUserPatchId = JSON.stringify({ idMessage: data.name })
             await axios.patch(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${route.params.userId}/chat/${store.state.userID}/${data.name}.json`, bodyUserPatchId )
 
-
-
-                
-            const myBody = JSON.stringify({
-                message: writeTextMessage.value,
-                userName: store.state.userName, 
-                userID: route.params.userId
-            })
-            await axios.post(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/chat/${route.params.userId}.json`, myBody )
-
+            await copyInMyBodySendMessage()
             writeTextMessage.value = ''
             await getUserChatData()
-
             setTimeout(()=>{
             const elem = document.querySelector('.chatUserMain')
             elem.scrollTo(0, 100000000)
@@ -114,13 +123,59 @@ export default{
         }
         }
 
+        const copyInMyBodySendMessage = async ()=>{
+            const myBody = JSON.stringify({
+                message: writeTextMessage.value,
+                userName: store.state.userName, 
+                userID: route.params.userId
+            })
+            const {data} = await axios.post(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/chat/${route.params.userId}.json`, myBody )
+
+            const myBodyPatchIdWriteMessage = JSON.stringify({ idMessage: data.name })
+            await axios.patch(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/chat/${route.params.userId}/${data.name}.json`, myBodyPatchIdWriteMessage )
+        }
+
+        const deleteMessage = async (id, message) => {
+            await axios.delete(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/chat/${route.params.userId}/${id}.json`)
+            // удаление из своей БД
+            const {data} = await axios.get(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${route.params.userId}/chat/${store.state.userID}.json`)
+            MyIdMessageInUserData.value = Object.values(data).filter(item => item.message === message && item.userName === store.state.userName).map(item => item.idMessage)
+            
+            await axios.delete(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${route.params.userId}/chat/${store.state.userID}/${MyIdMessageInUserData.value[0]}.json`)
+            // удаляем из БД пользователя кому написали. Ищем по одинаковому содержимому сообщения которое мы отправили в БД его сообщений в нашей переписке и так же чтоб имя пользователя отправителя
+            // было нашим, т.к. если будут еще одинаковые сообщения отправленные - то будет ошибка
+        }
+
+        const editMessage = async (id, message) =>{
+
+            const {data} = await axios.get(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${route.params.userId}/chat/${store.state.userID}.json`)
+            MyIdMessageInUserData.value = Object.values(data).filter(item => item.message === message && item.userName === store.state.userName).map(item => item.idMessage)
+
+            const bodyUser = JSON.stringify({
+                message: editFormMessageData.value.toLowerCase()
+            })
+            await axios.patch(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${route.params.userId}/chat/${store.state.userID}/${MyIdMessageInUserData.value[0]}.json`, bodyUser)
+
+
+            const myBody = JSON.stringify({
+                message: editFormMessageData.value.toLowerCase()
+            })
+            await axios.patch(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/chat/${route.params.userId}/${id}.json`, myBody)
+
+            editFormMessageData.value = ''
+            editFormOpen.value = false
+
+        }
 
 
         const updateChatData =
-            setInterval(()=>{
-                getUserChatData()
-            }, 5000)
-        
+        setInterval(()=>{ 
+                if(!editFormOpen.value){
+                    getUserChatData()
+                    console.log("обновил данные")
+                }
+        }, 5000)
+
         updateChatData
 
         setTimeout(()=>{
@@ -134,7 +189,7 @@ export default{
 
         getUserChatData()
 
-        return{userChatData, writeTextMessage, writeMessage}
+        return{userChatData, writeTextMessage, writeMessage, deleteMessage, editFormOpen, editFormMessageData, editMessage, func, messageIdClick}
     }
 }
 
@@ -143,6 +198,50 @@ export default{
 </script>
 
 <style>
+
+    .divEditFormMessage{
+    margin-top: 7.3rem;
+    height: 5rem;
+    width: 18rem;
+    margin-left: -17rem;
+    border: solid;
+    border-radius: 2rem;
+    background-color: cornflowerblue;
+    margin-bottom: 1rem;
+    padding: 0.5rem 0rem;
+    }
+
+    .divEditFormMessage textarea{
+    height: 3rem;
+    width: 14rem;
+    resize: none;
+    }
+
+    .editMessege{
+    cursor: pointer;
+    background-image: url(../assets/pencil.png);
+    padding: 0.8rem;
+    background-size: cover;
+    border-color: cornsilk;
+    border-radius: 40px;
+    margin-right: -0.3rem;
+    max-height: 1rem;
+    max-width: 1rem;
+    margin-top: 4.5rem;
+    }
+
+    .deleteMessege{
+    cursor: pointer;
+    background-image: url(../assets/delete.png);
+    padding: 0.8rem;
+    background-size: cover;
+    background-color: red;
+    border-radius: 40px;
+    margin-right: -1.8rem;
+    max-height: 1rem;
+    max-width: 1rem;
+    margin-top: -1rem;
+    }
 
     .newMessageInChatUser h3{
     width: -webkit-fill-available;
@@ -186,30 +285,35 @@ export default{
     height: 5rem;
     background-color: mediumaquamarine;
     padding-top: 0.5rem;
+    display: flex;
     }
 
-    .formSendMessage input{
-    margin-top: 0.8rem;
-    width: 14rem;
+    .formSendMessage textarea{
     height: 3rem;
+    width: 14rem;
+    resize: none;
     background-color: beige;
     border-radius: 10px;
+    margin-left: 1rem;
+    margin-top: 0.5rem;
     }
 
     .formSendMessage button{
+    width: 6rem;
     cursor: pointer;
-    padding: 1rem;
-    margin-left: 0.5rem;
+    height: 3rem;
     border-radius: 2rem;
     background-color: beige;
+    margin-left: 1rem;
+    margin-top: 0.7rem;
     }
 
     .chatUserMessageList{
     border: solid;
     border-radius: 49px;
     width: 17.5rem;
-    height: 5.5rem;
-    margin: 1rem 0rem;
+    height: 6.5rem;
+    margin: 2rem 0rem;
     margin-left: -4rem;
     background: mediumaquamarine;
     display: flex;
