@@ -4,8 +4,8 @@ export default createStore({
   state: {
     settingON: false,
     userID: null,
-    idRecordContactInDB: null,
-    contactDelete: null,
+    contactDelete: false,
+    contactAdded: false,
     newMessageTrue: false,
     usersChatList: '',
     allListUsers: '',
@@ -17,7 +17,7 @@ export default createStore({
     userName:'',
     userStatus:'',
     userImg:'',
-
+    messageSending: false
   },
   getters: {
   },

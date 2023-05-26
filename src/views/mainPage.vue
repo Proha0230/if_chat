@@ -55,16 +55,22 @@ const goSettings = ()=>{
 const goExit = ()=>{
     store.state.settingON = false
     store.state.userID = null
-    store.state.idRecordContactInDB = null
-    store.state.contactDelete = null
+    store.state.contactDelete = false
+    store.state.contactAdded = false
+    store.state.newMessageTrue = false
+    store.state.usersChatList = ''
+    store.state.allListUsers = ''
+    store.state.newMessageUserInChatList = ''
+    store.state.newMessageUser = {}
+    store.state.loading = false
     store.state.userEmail = ''
     store.state.userInfo = ''
     store.state.userName = ''
     store.state.userStatus = ''
     store.state.userImg = ''
+    store.state.messageSending = false
     router.push('/')
 }
-
 
 const goBack = ()=>{
     router.push('/chatList')

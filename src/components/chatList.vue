@@ -5,9 +5,10 @@
         <h2>Диалогов пока-что нет</h2>
     </div>
     <div v-if="usersChatList" >
-        <div v-for="user in usersChatList" :key="user"  class="allChatUser" @click="goChatUser(user.userID)">
-            <h4>{{ user.name }}</h4>
+        <div v-for="user in usersChatList" :key="user"  class="allChatUser" >
+            <h4 @click="goChatUser(user.userID)">{{ user.name }}</h4>
             <button v-if="func(user.userID)" class="newMessageButton"></button>
+            <button :style="{marginTop: func(user.userID) ? '-3rem' : '-5.8rem'}" class="deleteChatUser" @click="deleteMessage(user.userID)"></button>
         </div>
     </div>
 </div>
@@ -18,6 +19,7 @@
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import { ref, watch} from 'vue';
+import axios from 'axios';
 
 export default{
 
@@ -40,6 +42,18 @@ export default{
         }
     }
 
+    const deleteMessage = async (id) => {
+        try{
+            await axios.delete(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/chat/${id}.json`)
+            // удаление из своей БД
+
+            await axios.delete(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${id}/chat/${store.state.userID}.json`)
+            // удаляем из БД пользователя свой чат с ним
+        } catch(e){
+            console.log(e)
+        }
+        }
+
 
     watch(() => 
     store.state.usersChatList,
@@ -54,7 +68,7 @@ export default{
         router.push('/chatUser/' + id)
     }
 
-        return{usersChatList, goChatUser, func}
+        return{usersChatList, goChatUser, func, deleteMessage}
     }
 }
 
@@ -62,7 +76,20 @@ export default{
 
 <style>
 
-
+    .deleteChatUser{
+    cursor: pointer;
+    background-image: url(../assets/delete.png);
+    position: absolute;
+    padding: 1.5rem;
+    background-size: cover;
+    background-color: red;
+    border-radius: 40px;
+    max-height: 1rem;
+    max-width: 1rem;
+    display: block;
+    margin-top: -3.3rem;
+    margin-left: 17rem;
+    }
         
     .newMessageButton{
         cursor: pointer;
@@ -71,8 +98,9 @@ export default{
         background-size: contain;
         max-height: 1rem;
         max-width: 1rem;
-        margin-top: -2.5rem;
-        margin-left: 14rem;
+        margin-top: -5.8rem;
+        margin-left: -15rem;
+        border-width: 0px;
         display: flex;
         background-color: beige;
     }
@@ -90,8 +118,7 @@ export default{
 
     .allChatUser h4{
         width: 13rem;
-        height: 0rem;
-        margin-top: 2rem;
+        height: 4rem;
     }
 
     .chatListMain{

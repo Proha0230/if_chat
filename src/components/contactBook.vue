@@ -5,19 +5,19 @@
         <div class="contactDelete" v-if="$store.state.contactDelete">
             <h2>Вы удалили контакт</h2>
         </div>
-        <h2 v-if="!contactUserData">Контактов пока нет</h2>
-        <div class="allUserList" v-if="contactUserData">
-            <div class="contactBookList" :style="{height: user.writeMessage ? '9rem' : '5rem'}"  v-for="user in contactUserData" :key="user">
+        <h2 v-if="!contactAllUsersData">Контактов пока нет</h2>
+        <div class="allUserList" v-if="contactAllUsersData">
+            <div class="contactBookList" :style="{height: user.writeMessage ? '9rem' : '5rem'}"  v-for="user in contactAllUsersData" :key="user">
                 <form class="sendMessage" v-if="user.writeMessage" @submit.prevent="writeMessage(user.userID), user.writeMessage = false">
                     <textarea type="text" v-model="writeTextMessage" maxlength="81" spellcheck="true"></textarea>
-                    <button>Отправить</button>
+                    <button :disabled="$store.state.messageSending">Отправить</button>
                 </form>
                 <div class="contactUserInfo" @click="goToUser(user.userID)">
                 <h4>{{ user.name }}</h4>
                 <h4>{{ user.status }}</h4>
                 </div>
                 <button class="writeMessage" @click="user.writeMessage = !user.writeMessage"></button>
-                <button class="deleteContactUser" @click="deleteContact(user.userID, user.idRecordContactInBD)"></button>    
+                <button class="deleteContactUser" @click="deleteContact(user.userID, user.idContactInBD)"></button>    
             </div>
         </div>
     </div>
@@ -36,27 +36,55 @@ export default{
 
         const router = useRouter()
         const store = useStore()
+        const contactUserId = ref()
         const contactUserData = ref()
+        const contactAllUsersData = ref([])
         const writeTextMessage = ref('')
 
         const getContactsData = async ()=>{
         try{
-            const {data} = await axios.get(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/contactList.json`)           
-            contactUserData.value = Object.values(data)
+            const {data} = await axios.get(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/contactList.json`)
+            if(data !== null){        
+                contactUserId.value = Object.values(data)
+                await getContact()
+            } else {
+                contactAllUsersData.value = ''
+            }
         } catch(e){}
         }
+
+    const getContact = async ()=>{
+        try{
+            for(let i = 0; i < contactUserId.value.length; i++){
+                const {data} = await axios.get(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/.json`)
+                contactUserData.value = Object.values(data).filter(userInAllData => contactUserId.value[i].userID.includes(userInAllData.userID)).map(item =>{
+                    const obj = {
+                        status: item.status,
+                        name: item.name,
+                        userID: item.userID,
+                    }
+                    return obj
+                })[0]
+
+                contactUserData.value = Object.assign({}, contactUserId.value[i], contactUserData.value)
+                contactAllUsersData.value[i] = contactUserData.value
+            }
+        } catch(e){
+            console.log(e)
+        }
+    }
 
         const deleteContact = async (id, idInDB)=>{
         try{
             await axios.delete(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/contactList/${idInDB}.json`)
-            contactUserData.value = contactUserData.value.filter(contact => contact.userID !== id)
-            store.state.contactDelete = true
+            contactAllUsersData.value = contactAllUsersData.value.filter(contact => contact.userID !== id)
+            store.state.contactDelete = true 
 
             setTimeout(()=>{
-            if(!contactUserData.value.length){
-                contactUserData.value = ''
+            if(!contactAllUsersData.value.length){
+                contactAllUsersData.value = ''
             }
-            store.state.contactDelete = null
+            store.state.contactDelete = false
             }, 2000)
         }catch(e){
             console.log(e)
@@ -65,21 +93,25 @@ export default{
 
         const writeMessage = async (id)=> {
         try{
-            const bodyUserSends = JSON.stringify({
-                message: writeTextMessage.value,
-                userName: store.state.userName,
-                userID: store.state.userID,
-                newMessage: true
-            })
-            const {data} = await axios.post(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${id}/chat/${store.state.userID}.json`, bodyUserSends )
-            
-            const bodyUserPatchId = JSON.stringify({ idMessage: data.name })
-            await axios.patch(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${id}/chat/${store.state.userID}/${data.name}.json`, bodyUserPatchId )
+            if(writeTextMessage.value.length > 1){
+                const bodyUserSends = JSON.stringify({
+                    message: writeTextMessage.value.toLowerCase(),
+                    userName: store.state.userName,
+                    userID: store.state.userID,
+                    newMessage: true
+                })
+                const {data} = await axios.post(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${id}/chat/${store.state.userID}.json`, bodyUserSends )
+                
+                store.state.messageSending = true
 
+                const bodyUserPatchId = JSON.stringify({ idMessage: data.name })
+                await axios.patch(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${id}/chat/${store.state.userID}/${data.name}.json`, bodyUserPatchId )
 
-            await copyInMyBodySendMessage(id)
-            writeTextMessage.value = ''
-            goChatUser(id)
+                await copyInMyBodySendMessage(id)
+                writeTextMessage.value = ''
+                store.state.messageSending = false
+                goChatUser(id)
+            }
         } catch(e){
             console.log(e)
         }
@@ -87,7 +119,7 @@ export default{
 
         const copyInMyBodySendMessage = async (id)=>{
         const myBody = JSON.stringify({
-            message: writeTextMessage.value,
+            message: writeTextMessage.value.toLowerCase(),
             userName: store.state.userName, 
             userID: id
         })
@@ -109,7 +141,7 @@ export default{
             router.push('/userContact/' + id)
         }
 
-        return{goToUser,contactUserData, deleteContact, writeTextMessage, writeMessage}
+        return{goToUser,contactAllUsersData, deleteContact, writeTextMessage, writeMessage}
     }
 }
     

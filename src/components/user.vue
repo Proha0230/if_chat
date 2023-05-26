@@ -1,7 +1,7 @@
 <template>
 <div >
     <div class="userMain" >
-        <div class="contactAdded" v-if="$store.state.idRecordContactInDB">
+        <div class="contactAdded" v-if="$store.state.contactAdded">
             <h2>Вы добавили {{ name }} в контакты</h2>
         </div>
         <div class="userImg">
@@ -77,21 +77,19 @@ export default{
         try{
             const body = JSON.stringify({
                 writeMessage: false,
-                userID: userId.value, 
-                img: img.value,
-                name: name.value,
-                status: status.value,
-                info: info.value
+                userID: userId.value
                 })
             const {data} = await axios.post(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/contactList.json`, body )
-            store.state.idRecordContactInDB = data.name
 
-            const idInDB = JSON.stringify({idRecordContactInBD: store.state.idRecordContactInDB})
-            await axios.patch(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/contactList/${store.state.idRecordContactInDB}.json`, idInDB )
+            store.state.contactAdded = true
 
+            const idInDB = JSON.stringify({idContactInBD: data.name})
+            await axios.patch(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/contactList/${data.name}.json`, idInDB )
+            
             setTimeout(()=>{
-                store.state.idRecordContactInDB = null
+                store.state.contactAdded = false
             }, 2000)
+
         } catch (e) {
             console.log(e)
         }

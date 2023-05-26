@@ -30,10 +30,16 @@ export default{
     const getChatUserList = async ()=>{
     try{
         const {data} = await axios.get(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}/chat.json`)
+      if(data !== null){
         userChatId.value = Object.keys(data)
         await getUserChat()
         await NewMessageID()
         store.state.loading = false
+      } else {
+        store.state.usersChatList = ''
+        store.state.newMessageTrue = false
+        store.state.loading = false
+      }
     } catch (e){
         console.log(e)
     }
