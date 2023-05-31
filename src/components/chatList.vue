@@ -58,8 +58,11 @@ export default{
     watch(() => 
     store.state.usersChatList,
     async () => {
+    if(store.state.newMessageTrue){
     await router.push('/contactBook')
     await router.push('/chatList')
+    console.log('Обновил')
+    }
     })
 
 

@@ -13,5 +13,8 @@
         "destination": "/index.html"
       }
     ]
+  },
+  "storage": {
+    "rules": "gs://if-chat-29cb0.appspot.com"
   }
 }

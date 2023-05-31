@@ -209,9 +209,9 @@ export default{
         setInterval(()=>{ 
                 if(!editFormOpen.value){
                     getUserChatData()
-                    console.log("обновил данные")
+                    console.log('Обновил')
                 }
-        }, 5000)
+        }, 10000)
 
         updateChatData
 

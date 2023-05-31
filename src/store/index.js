@@ -16,7 +16,6 @@ export default createStore({
     userInfo: '',
     userName:'',
     userStatus:'',
-    userImg:'',
     messageSending: false
   },
   getters: {

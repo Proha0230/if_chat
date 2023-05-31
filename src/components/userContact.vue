@@ -2,7 +2,7 @@
     <div >
         <div class="userMain" >
             <div class="userImg">
-                <img :src="img ?? 'https://i.ibb.co/dMqXwmP/no-image.jpg' " alt="Изображения нет"/>
+                <img :src="imgUser ?? 'https://i.ibb.co/dMqXwmP/no-image.jpg' " alt="Изображения нет"/>
             </div>
     
             <div class="userNameMain">
@@ -36,8 +36,8 @@
     
     <script>
     import { ref } from 'vue'
-    import { useRoute } from 'vue-router'
-    import { useRouter } from 'vue-router'
+    import { ref as refStorage, getStorage, getDownloadURL } from 'firebase/storage'
+    import { useRoute, useRouter } from 'vue-router'
     import { useStore } from 'vuex'
     import axios from 'axios'
     
@@ -48,7 +48,11 @@
         const store = useStore()
         const router = useRouter()
         const userId = ref(route.params.userId)
-        const img = ref()
+
+        const storage = getStorage()
+        const storageRef = refStorage(storage, `/avatar/${userId.value}`)
+
+        const imgUser = ref()
         const name = ref()
         const status = ref()
         const info = ref()
@@ -60,7 +64,6 @@
         const LoadOnePlayer = async ()=> {
         try{
         const {data} = await axios.get(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${userId.value}.json`)
-        img.value = data.img
         name.value = data.name
         status.value = data.status
         info.value = data.info
@@ -69,9 +72,25 @@
         }
         }
 
+        const getImage = async () => {
+        try{
+            imgUser.value = await getDownloadURL(storageRef)
+        } catch(e){
+            imgUser.value = 'https://i.ibb.co/dMqXwmP/no-image.jpg'
+        }
+        // .then((url)=>{
+        //     imgDataServer.value = url
+        // })
+        // .catch(()=>{
+        //     imgDataServer.value = 'https://i.ibb.co/dMqXwmP/no-image.jpg' 
+        // })
+        };
+
+        getImage()
+
         LoadOnePlayer()
     
-            return{img, name, status, info, goBack}
+            return{imgUser, name, status, info, goBack}
         }
     }
     

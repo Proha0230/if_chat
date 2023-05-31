@@ -67,7 +67,6 @@ const goExit = ()=>{
     store.state.userInfo = ''
     store.state.userName = ''
     store.state.userStatus = ''
-    store.state.userImg = ''
     store.state.messageSending = false
     router.push('/')
 }

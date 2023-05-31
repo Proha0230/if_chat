@@ -1,15 +1,11 @@
 <template>
 <div >
     <div class="mainSettings" >
-        <div class="imgSettings">
-            <img :src="img ?? 'https://i.ibb.co/dMqXwmP/no-image.jpg' " alt="Изображения нет"/>
-            <button class="editImgButtonSettings" @click="ButtonImgEdit = !ButtonImgEdit"></button>
-        </div>
 
-        <form class="formImgUpdate" v-if="ButtonImgEdit" @submit.prevent="imgEditChange">
-            <input type="text" placeholder="Введите url изображения" v-model="imgEdit"/>
-            <button>Изменить</button>
-            </form>
+        <uploadImage>
+
+        </uploadImage>
+
 
         <div class="editNameSettingsMain">
             <div class="editInfoSettings">
@@ -59,7 +55,7 @@
 import { ref } from 'vue';
 import { useStore } from 'vuex';
 import axios from 'axios';
-
+import uploadImage from './uploadImage.vue';
 
 export default{
 
@@ -67,17 +63,15 @@ export default{
 
         const ButtonNameEdit = ref(false)
         const ButtonInfoEdit = ref(false)
-        const ButtonImgEdit = ref(false)
         const ButtonStatusEdit = ref(false)
         const store = useStore()
         const nameEdit = ref()
-        const imgEdit = ref()
         const statusEdit = ref()
         const infoEdit = ref()
         const name = ref(store.state.userName)
-        const img = ref(store.state.userImg)
         const status = ref(store.state.userStatus)
         const info = ref(store.state.userInfo)
+
 
         const nameEditChange = async ()=> {
             try{
@@ -91,17 +85,6 @@ export default{
             }
         }
 
-        const imgEditChange = async ()=> {
-            try{
-                const body = JSON.stringify({img: imgEdit.value ?? 'https://i.ibb.co/dMqXwmP/no-image.jpg'})
-                await axios.patch(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}.json`, body )
-                img.value = imgEdit.value ?? 'https://i.ibb.co/dMqXwmP/no-image.jpg'
-                store.state.userImg = imgEdit.value ?? 'https://i.ibb.co/dMqXwmP/no-image.jpg'
-                ButtonImgEdit.value = false
-            } catch(e){
-                console.log(e)
-            }
-        }
 
         const statusEditChange = async ()=> {
             try{
@@ -129,9 +112,9 @@ export default{
 
 
 
-        return{ButtonNameEdit, ButtonInfoEdit, ButtonImgEdit, ButtonStatusEdit, name, img, status, info, nameEdit,
-               imgEdit, statusEdit, infoEdit, nameEditChange, imgEditChange, statusEditChange, InfoEditChange}
-    }
+        return{ButtonNameEdit, ButtonInfoEdit, ButtonStatusEdit, name, status, info, nameEdit, statusEdit, infoEdit, nameEditChange, statusEditChange, InfoEditChange}
+    },
+    components:{uploadImage}
 }
 
 </script>
@@ -223,15 +206,37 @@ export default{
 }
 
 .formImgUpdate input{
-    width: 11rem;
-    border-radius: 6px;
+    cursor: pointer;
+    width: 9.3rem;
+    height: 1.5rem;
+    border-radius: 2rem;
     margin-bottom: 1rem;
+    border: solid;
+    padding: 0.5rem;
+    border-color: mediumaquamarine;
+    font-size: 1rem;
+    background-color: beige;
 }
+
+.formImgUpdate input[type="file"]::-webkit-file-upload-button {
+    visibility: hidden;
+}
+
+.formImgUpdate input[type="file"]::before {
+    content: 'Выберите файл';
+    display: inline-block;
+    color: black;
+    font-size: 1.1rem;
+    cursor: pointer;
+    text-indent: 0.5rem;
+}
+
 
 .formImgUpdate button{
     border-radius: 20px;
     padding: 0.5rem;
     background-color: mediumaquamarine;
+    margin-top: 1rem;
 }
 
 

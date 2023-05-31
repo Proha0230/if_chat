@@ -61,10 +61,7 @@ export default{
               if(Object.values(data).filter(user => user.newMessage === true).map(item => item.userID).length > 0 && !store.state.newMessageUser[i]){
                 store.state.newMessageUser[i] = Object.values(data).filter(user => user.newMessage === true).map(item => item.userID)
                 store.state.newMessageTrue = true
-                console.log("Эта сучка записала еще раз")
               }
-
-
             }
             for( let i = 0; i < store.state.newMessageUser.length; i++){
               store.state.newMessageUser[i] = store.state.newMessageUser[i].filter((value,index) => index === store.state.newMessageUser[i].indexOf(value))
@@ -85,7 +82,7 @@ export default{
     const updateChatData =
         setInterval(()=>{
             getChatUserList()
-        }, 5000)
+        }, 10000)
         
     updateChatData
 

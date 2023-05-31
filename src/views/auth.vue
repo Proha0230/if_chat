@@ -71,17 +71,15 @@ setup(){
     const recordDataNewUser = async () => {
         try{
             const {data} = await axios.get(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}.json`)
-            if( !data.info || !data.name || !data.status || !data.img ){
+            if( !data.info || !data.name || !data.status ){
             
             const bodyNewUser = JSON.stringify({
             info: data.info ?? 'Нет информации',
             name: data.name ?? 'Имя не задано',
-            status: data.status ?? 'Нет статуса',
-            img: data.img ?? 'https://i.ibb.co/dMqXwmP/no-image.jpg'
+            status: data.status ?? 'Нет статуса'
 
         })
             await axios.patch(`https://if-chat-29cb0-default-rtdb.firebaseio.com/users/${store.state.userID}.json`, bodyNewUser )
-            console.log('Информация о новом пользователе обновлена')
         }
         } catch(e){
             console.log(e)
@@ -95,7 +93,6 @@ setup(){
             store.state.userInfo = data.info
             store.state.userName = data.name
             store.state.userStatus = data.status
-            store.state.userImg = data.img
         } catch(e){
             console.log(e)
         }
