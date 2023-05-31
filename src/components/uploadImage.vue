@@ -34,9 +34,10 @@ export default{
         await uploadBytes(storageRef, imgEdit.value, metadata.value)
         imgEdit.value = null
         metadata.value = null
+        ButtonImgEdit.value = false
         await getImage()
         } catch(e){
-            
+        ButtonImgEdit.value = false
         }
         }
 
